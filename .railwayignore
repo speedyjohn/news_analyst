@@ -1,0 +1,18 @@
+# railway up заливает каталог целиком и фильтрует его по .gitignore/.railwayignore,
+# а не по .dockerignore — тот применяется уже на сборке образа. Репозиторий git здесь
+# не инициализирован, полагаться на .gitignore нельзя, поэтому список продублирован.
+# Без него в загрузку уезжает .venv (~145 МБ) и node_modules.
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+node_modules/
+web/node_modules/
+web/dist/
+
+.env
+.git/
+.claude/
+design/
+docs/

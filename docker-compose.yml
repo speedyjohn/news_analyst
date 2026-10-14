@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: news
+      POSTGRES_PASSWORD: news
+      POSTGRES_DB: news
+    # 5432 на хосте часто занят локальным PostgreSQL — публикуем на 5433.
+    ports: ["5433:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U news"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    # command намеренно не задан: и здесь, и на Railway работает CMD из Dockerfile,
+    # он же применяет миграции на старте. Две разные команды запуска рано или поздно
+    # разъезжаются, и локально всё зелено, а в проде падает.
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql+psycopg://news:news@db:5432/news
+    depends_on:
+      db: {condition: service_healthy}
+    ports: ["8000:8000"]
+
+  worker:
+    build: .
+    # Тот же образ, что и у api, роль выбирается переменной — как на Railway.
+    env_file: [.env]
+    environment:
+      ROLE: worker
+      DATABASE_URL: postgresql+psycopg://news:news@db:5432/news
+    depends_on:
+      db: {condition: service_healthy}
+
+  web:
+    build:
+      context: ./web
+    ports: ["5173:80"]
+    depends_on: [api]
+
+volumes:
+  pgdata:

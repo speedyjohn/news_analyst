@@ -1,0 +1,51 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+:root {
+  --bs-primary: #14509b;
+  --bs-primary-rgb: 20, 80, 155;
+  --bs-border-radius: 7px;
+  --bs-border-radius-sm: 5px;
+  --bs-border-radius-lg: 8px;
+  --bs-body-font-family: 'Inter', system-ui, sans-serif;
+  --bs-body-color: #191d23;
+  --bs-border-color: #dfe3e8;
+  --bs-link-color: #14509b;
+  --bs-link-hover-color: #0e3a72;
+}
+
+body {
+  margin: 0;
+  background: #f5f6f7;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px;
+  color: #191d23;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: #14509b; }
+a:hover { color: #0e3a72; }
+
+.btn-primary {
+  --bs-btn-bg: #14509b;
+  --bs-btn-border-color: #14509b;
+  --bs-btn-hover-bg: #0e3a72;
+  --bs-btn-hover-border-color: #0e3a72;
+  --bs-btn-active-bg: #0e3a72;
+  --bs-btn-active-border-color: #0e3a72;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #14509b;
+  --bs-btn-border-color: #c9d4e2;
+  --bs-btn-hover-bg: #14509b;
+  --bs-btn-hover-border-color: #14509b;
+  --bs-btn-active-bg: #14509b;
+}
+
+.table > :not(caption) > * > * { padding: 0.7rem 0.75rem; }
+
+@media (max-width: 900px) {
+  .news-layout { grid-template-columns: minmax(0, 1fr) !important; }
+  .news-aside { position: static !important; }
+}

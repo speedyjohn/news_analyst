@@ -1,0 +1,22 @@
+#!/bin/sh
+# Расширение .envsh, а не .sh: штатный энтрипоинт nginx такие файлы именно
+# подключает через `.`, поэтому export долетает до envsubst. Файл с .sh
+# запустился бы в отдельном процессе, и переменная потерялась бы.
+#
+# Зачем вообще: nginx не читает /etc/resolv.conf сам, ему нужен явный resolver.
+# Без него proxy_pass с переменной не соберётся, а без переменной nginx резолвит
+# upstream на старте и падает, если сервис API ещё не поднялся.
+set -e
+
+NGINX_RESOLVER=$(awk '/^nameserver/ { print $2; exit }' /etc/resolv.conf)
+
+# IPv6-адрес nginx принимает только в квадратных скобках.
+case "$NGINX_RESOLVER" in
+    *:*) NGINX_RESOLVER="[$NGINX_RESOLVER]" ;;
+esac
+
+# Railway приватную сеть держит на IPv6, docker compose — на IPv4. Пустой
+# резолвер оставлять нельзя: конфиг не соберётся, поэтому падаем обратно на
+# docker-овский встроенный DNS.
+export NGINX_RESOLVER="${NGINX_RESOLVER:-127.0.0.11}"
+echo "resolver: $NGINX_RESOLVER"

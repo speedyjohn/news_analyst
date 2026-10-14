@@ -1,0 +1,17 @@
+# railway up загружает каталог целиком, поэтому мусор отсекаем здесь.
+# Без этого в сборку уезжает .venv (~145 МБ) и node_modules.
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+node_modules/
+web/node_modules/
+web/dist/
+
+.env
+.git/
+.claude/
+design/
+docs/
+*.md

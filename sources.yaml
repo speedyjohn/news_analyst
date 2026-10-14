@@ -1,0 +1,165 @@
+# Единственный источник правды по источникам. Код о конкретных сайтах не знает.
+# После правки — перезапуск api (синхронизация в таблицу sources идёт на старте).
+#
+# type:   rss | html
+# parser: rss | html  (html читает блок selectors ниже)
+# priority: чем меньше, тем выше приоритет при дедупликации одинаковых новостей.
+# enabled: false + комментарий — источник заведён, но не собирается.
+
+- code: akorda
+  name: Акорда · Пресс-служба Президента РК
+  country: KZ
+  category_hint: political_economic
+  type: rss
+  url: https://www.akorda.kz/ru/events
+  feed_url: https://www.akorda.kz/ru/rss
+  parser: rss
+  priority: 1
+  enabled: true
+  selectors:
+    # Фид отдаёт пустые description и относительные ссылки — текст берём со страницы.
+    body: "div.col-lg-8"
+
+- code: primeminister
+  name: Правительство РК
+  country: KZ
+  category_hint: political_economic
+  type: html
+  url: https://primeminister.kz/ru/news
+  parser: primeminister
+  priority: 1
+  enabled: true   # RSS нет (probe_sources.py), адаптер app/parsers/html/primeminister.py
+
+- code: inform
+  name: КазИнформ
+  country: KZ
+  category_hint: political_economic
+  type: html
+  url: https://www.inform.kz/ru
+  parser: inform
+  priority: 1
+  enabled: true   # RSS нет (probe_sources.py), адаптер app/parsers/html/inform.py
+
+- code: gov
+  name: Единый портал государственных органов gov.kz
+  country: KZ
+  category_hint: political_economic
+  type: rss
+  url: https://www.gov.kz/memleket/entities/mfa/press/news?lang=ru
+  feed_url: https://www.gov.kz/api/v1/public/content-manager/news/rss?lang=ru
+  parser: rss
+  priority: 1
+  enabled: false   # probe_sources.py: RSS не найден, нужен html-адаптер
+
+- code: nationalbank
+  name: Национальный Банк РК
+  country: KZ
+  category_hint: political_economic
+  type: rss
+  url: https://www.nationalbank.kz/ru/news
+  feed_url: https://www.nationalbank.kz/rss/rss.xml
+  parser: rss
+  priority: 2
+  enabled: false   # probe_sources.py: страница отдаёт 404, нужен актуальный адрес раздела
+
+- code: mazhilis
+  name: Мажилис Парламента РК
+  country: KZ
+  category_hint: political_economic
+  type: html
+  url: https://www.parlam.kz/ru/mazhilis/news
+  parser: html
+  priority: 2
+  enabled: false   # требует html-адаптера: подобрать selectors
+  selectors:
+    item: ".news-item"
+    title: "a"
+    link: "a"
+    date: ".date"
+    body: ".news-detail"
+
+- code: senate
+  name: Сенат Парламента РК
+  country: KZ
+  category_hint: political_economic
+  type: html
+  url: https://www.parlam.kz/ru/senate/news
+  parser: html
+  priority: 2
+  enabled: false   # требует html-адаптера
+
+- code: stat
+  name: Бюро национальной статистики РК
+  country: KZ
+  category_hint: political_economic
+  type: html
+  url: https://stat.gov.kz/ru/news/
+  parser: html
+  priority: 2
+  enabled: false   # требует html-адаптера
+
+- code: adilet
+  name: Информационно-правовая система «Адилет»
+  country: KZ
+  category_hint: political_economic
+  type: html
+  url: https://adilet.zan.kz/rus/docs
+  parser: html
+  priority: 1
+  enabled: false   # используется скриптом load_legal.py, не суточным сбором
+                   # probe_sources.py: неполная цепочка TLS-сертификатов
+
+- code: un_ru
+  name: Новости ООН
+  country: INT
+  category_hint: other
+  type: rss
+  url: https://news.un.org/ru
+  feed_url: https://news.un.org/feed/subscribe/ru/news/all/rss.xml
+  parser: rss
+  priority: 1
+  enabled: true
+
+- code: ec
+  name: Европейская комиссия
+  country: EU
+  category_hint: political_economic
+  type: rss
+  url: https://ec.europa.eu/commission/presscorner/home/en
+  feed_url: https://ec.europa.eu/commission/presscorner/api/rss?language=en
+  parser: rss
+  priority: 2
+  language: en
+  enabled: true    # фид подтверждён probe_sources.py (10 записей); материалы на английском
+
+- code: eaeu
+  name: Евразийский экономический союз
+  country: INT
+  category_hint: political_economic
+  type: html
+  url: https://eec.eaeunion.org/news/
+  parser: html
+  priority: 2
+  enabled: false   # требует html-адаптера
+
+- code: imf
+  name: Международный валютный фонд
+  country: INT
+  category_hint: political_economic
+  type: rss
+  url: https://www.imf.org/en/News
+  feed_url: https://www.imf.org/en/News/RSS?Language=RUS
+  parser: rss
+  priority: 2
+  enabled: false   # probe_sources.py: 403 Forbidden, площадка блокирует бота
+
+- code: worldbank
+  name: Всемирный банк
+  country: INT
+  category_hint: political_economic
+  type: rss
+  url: https://www.vsemirnyjbank.org/ru/news
+  feed_url: https://www.vsemirnyjbank.org/ru/news/all?format=rss
+  parser: rss
+  priority: 2
+  enabled: false   # probe_sources.py: RSS не найден, нужен html-адаптер

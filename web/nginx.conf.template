@@ -1,0 +1,35 @@
+server {
+    # Railway назначает порт сам и передаёт его в $PORT. Локально в compose — 80.
+    listen ${PORT};
+    listen [::]:${PORT};
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # SPA: любой маршрут отдаёт index.html, роутинг разбирает React.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # API проксируется с того же origin, что и фронт. Это не удобство, а условие
+    # работы авторизации: JWT лежит в httpOnly-куке с SameSite=Lax, и на
+    # межсайтовый запрос браузер её не пошлёт. Пока API ходит через этот location,
+    # CORS и SameSite=None не нужны.
+    location /api/ {
+        # Резолвер и переменная в proxy_pass — чтобы адрес API разрешался на каждый
+        # запрос, а не один раз при старте. Иначе nginx не поднимется, пока не
+        # поднят сервис API, и словит crash-loop на деплое.
+        resolver ${NGINX_RESOLVER} valid=10s ipv6=on;
+        set $upstream ${API_UPSTREAM};
+        proxy_pass $upstream;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # Нужно, если API_UPSTREAM указывает на https-адрес: без этого TLS-хендшейк
+        # уйдёт без SNI и Railway отдаст чужой сертификат.
+        proxy_ssl_server_name on;
+        # Юридический модуль в замерах доходил до 98 с. Дефолтные 60 с обрывают ответ.
+        proxy_read_timeout 180s;
+    }
+}
